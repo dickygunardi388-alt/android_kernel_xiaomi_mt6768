@@ -37,9 +37,14 @@ ccci_port-y += port_proxy.o
 ccci_port-y += port_rpc.o
 ccci_port-y += port_smem.o
 ccci_port-y += port_sysmsg.o
+ifeq ($(CONFIG_TARGET_PRODUCT_SELENECOMMON),y)
+ifeq ($(CONFIG_SWTP_DRIVER),y)
+ccci_port-y += ccci_swtp_selene.o
+endif
+else
 ccci_port-y += ccci_swtp.o
+endif
 
 else
 obj-  := dummy.o # avoid build error
 endif
-
