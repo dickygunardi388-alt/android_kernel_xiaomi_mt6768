@@ -941,10 +941,7 @@ static int bq2589x_get_charger_type(struct bq2589x *bq, enum charger_type *type)
 
 	if(mt_chg != NULL)
 		mt_chg->usb_desc.type = smblib_apsd_results[chg_type];
-	/*K19A HQ-129052 K19A charger of thermal by wangqi at 2021/4/22 end*/
-	/*K19A-104 charge by wangchao at 2021/4/8 start*/
-	pr_err("vbus_stat:%d ,chg_type:%d\n", vbus_stat,chg_type);
-	/*K19A-104 charge by wangchao at 2021/4/8 end*/
+	pr_debug("vbus_stat:%d ,chg_type:%d\n", vbus_stat,chg_type);
 	return 0;
 }
 
@@ -1184,15 +1181,15 @@ static irqreturn_t bq2589x_irq_handler(int irq, void *data)
 /* Huaqin modify for WXYFB-592 by miaozhichao at 2021/3/29 start */
 /* Huaqin add for HQ-134476 by miaozhichao at 2021/5/29 start */
 	if (!prev_pg && bq->power_good) {
-		pr_err("adapter/usb inserted\n");
+		pr_debug("adapter/usb inserted\n");
 		charger_detect_count = 3;
 		charger_float_count = 0;
 	}else if (prev_pg && !bq->power_good){
 		hvdcp_type_tmp = HVDCP_NULL;
 		charger_detect_count = 0;
 		charger_float_count = 30;
-	}else{
-		pr_err("prev_pg = %d  bq->power_good = %d\n",prev_pg,bq->power_good);
+	} else {
+		pr_debug("prev_pg = %d  bq->power_good = %d\n",prev_pg,bq->power_good);
 	}
 /* Huaqin add for HQ-134476 by miaozhichao at 2021/5/29 end */
 /* Huaqin modify for WXYFB-592 by miaozhichao at 2021/3/29 end */
@@ -1220,7 +1217,7 @@ static int bq2589x_register_interrupt(struct bq2589x *bq)
 		pr_err("request thread irq failed:%d\n", ret);
 		return ret;
 	}else{
-		pr_err("request thread irq pass:%d  bq->client->irq =%d\n", ret, bq->client->irq);
+		pr_debug("request thread irq pass:%d  bq->client->irq =%d\n", ret, bq->client->irq);
 	}
 
 	enable_irq_wake(bq->irq);
