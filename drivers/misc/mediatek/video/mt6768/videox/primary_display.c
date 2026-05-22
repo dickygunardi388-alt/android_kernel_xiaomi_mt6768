@@ -3833,9 +3833,6 @@ int primary_display_init(char *lcm_name, unsigned int lcm_fps,
 	DISPCHECK("%s begin lcm=%s, inited=%d\n",
 		__func__, lcm_name, is_lcm_inited);
 
-	pm_qos_add_request(&fb_blank_ddr_req, PM_QOS_DDR_OPP,
-		PM_QOS_DDR_OPP_DEFAULT_VALUE);
-
 	dprec_init();
 	dpmgr_init();
 	if (bdg_is_bdg_connected() == 1) {
@@ -4531,7 +4528,6 @@ int primary_display_deinit(void)
 	pm_qos_remove_request(&primary_display_mm_freq_request);
 #endif
 
-	pm_qos_remove_request(&fb_blank_ddr_req);
 	return 0;
 }
 
