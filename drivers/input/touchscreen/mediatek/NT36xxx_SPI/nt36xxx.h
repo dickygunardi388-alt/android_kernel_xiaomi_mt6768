@@ -108,6 +108,8 @@ extern const uint16_t touch_key_array[TOUCH_KEY_NUM];
 /* Enable only when module have tp reset pin and connected to host */
 #ifndef CONFIG_TARGET_PRODUCT_SELENECOMMON
 #define NVT_TOUCH_SUPPORT_HW_RST 1
+#else
+#define NVT_TOUCH_SUPPORT_HW_RST 0
 #endif
 
 //---Customerized func.---
@@ -294,5 +296,9 @@ int32_t nvt_esd_vdd_tp_recovery(void);
 #define ABS_X_MAX TOUCH_DEFAULT_MAX_WIDTH
 #define ABS_Y_MAX TOUCH_DEFAULT_MAX_HEIGHT
 #define MAX_BUTTON_NUM TOUCH_KEY_NUM
+#else
+#define RESET_GPIO (ts->reset_gpio)
+#define IRQ_GPIO (ts->irq_gpio)
+#define MAX_BUTTON_NUM (ts->max_button_num)
 #endif
 #endif /* _LINUX_NVT_TOUCH_H */
