@@ -942,6 +942,9 @@ static void DSI_Get_Porch_Addr(enum DISP_MODULE_ENUM module,
 	}
 }
 
+/* Huaqin add for K19S-31 by jiangyue at 2022/01/14 start */
+extern int mtk_rxtx_ratio;
+/* Huaqin add for K19S-31 by jiangyue at 2022/01/14 end */
 void DSI_Config_VDO_Timing_with_DSC(enum DISP_MODULE_ENUM module,
 	struct cmdqRecStruct *cmdq, struct LCM_DSI_PARAMS *dsi_params)
 {
@@ -1017,7 +1020,9 @@ void DSI_Config_VDO_Timing_with_DSC(enum DISP_MODULE_ENUM module,
 		t_hbp = 4;
 		ps_wc = dsi_params->horizontal_active_pixel * dsiTmpBufBpp / 8;
 		t_hbllp = 16 * dsi_params->LANE_NUM;
-		ap_tx_total_word_cnt = (get_bdg_line_cycle() * lanes * RXTX_RATIO + 99) / 100;
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 start */
+		ap_tx_total_word_cnt = (get_bdg_line_cycle() * lanes * mtk_rxtx_ratio + 99) / 100;
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 end */
 
 		switch (dsi_params->mode) {
 		case DSI_CMD_MODE:
@@ -2233,7 +2238,7 @@ void DSI_PHY_TIMCONFIG(enum DISP_MODULE_ENUM module,
 
 		/* clk_trail > 60ns (spec) */
 		/* clk_trail = 100ns */
-		timcon2.CLK_TRAIL = NS_TO_CYCLE(100, cycle_time) + 1;
+		timcon2.CLK_TRAIL = NS_TO_CYCLE(88, cycle_time) + 1;
 		if (timcon2.CLK_TRAIL < 2)
 			timcon2.CLK_TRAIL = 2;
 		timcon2.CONT_DET = 0;
@@ -6463,6 +6468,7 @@ static const char *dsi_mode_spy(enum LCM_DSI_MODE_CON mode)
 
 void dsi_analysis(enum DISP_MODULE_ENUM module)
 {
+#if 0
 	int i = 0;
 
 	DDPDUMP("== DISP DSI ANALYSIS ==\n");
@@ -6508,6 +6514,7 @@ void dsi_analysis(enum DISP_MODULE_ENUM module)
 			i, DSI_REG[i]->DSI_LFR_CON.LFR_TYPE,
 			DSI_REG[i]->DSI_LFR_CON.LFR_SKIP_NUM);
 	}
+#endif
 }
 
 int ddp_dsi_dump(enum DISP_MODULE_ENUM module, int level)
