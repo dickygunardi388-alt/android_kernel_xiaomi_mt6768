@@ -110,6 +110,17 @@
 
 #define FRM_UPDATE_SEQ_CACHE_NUM (DISP_INTERNAL_BUFFER_COUNT+1)
 
+#define SWITCH_FPS_IN_WORKQUEUE
+
+#ifdef SWITCH_FPS_IN_WORKQUEUE
+
+#include "helio-dvfsrc-opp.h"
+#include "mtk_boot_common.h"
+
+static struct work_struct sWork;
+static struct workqueue_struct *fb_resume_workqueue;
+#endif
+
 static struct disp_internal_buffer_info
 	*decouple_buffer_info[DISP_INTERNAL_BUFFER_COUNT];
 static struct RDMA_CONFIG_STRUCT decouple_rdma_config;
@@ -249,6 +260,38 @@ void lock_primary_wake_lock(bool lock)
 	}
 
 }
+
+
+#ifdef SWITCH_FPS_IN_WORKQUEUE
+static void fb_resume_func(struct work_struct *work)
+{
+	DISPMSG("Enter %s", __func__);
+#ifdef CONFIG_MTK_KERNEL_POWER_OFF_CHARGING
+	if (get_boot_mode() == KERNEL_POWER_OFF_CHARGING_BOOT
+		|| get_boot_mode() == LOW_POWER_OFF_CHARGING_BOOT) {
+		DISPMSG("power off charging mode, skip switch fps!");
+		return;
+	}
+#endif
+#ifdef CONFIG_MTK_HIGH_FRAME_RATE
+	if (primary_display_is_support_DynFPS()) {
+		int last_cfg = primary_display_get_current_cfg_id();
+
+		DISPMSG("DynFPS. switch fps in fb_resume_func");
+
+		/* easy way to force change fps */
+		primary_display_update_cfg_id(!last_cfg);
+		primary_display_dynfps_chg_fps(last_cfg);
+	}
+#endif
+}
+
+void fb_resume_queue_work(void)
+{
+	queue_work(fb_resume_workqueue, &sWork);
+}
+#endif
+
 
 static int smart_ovl_try_switch_mode_nolock(void);
 
@@ -3790,6 +3833,9 @@ int primary_display_init(char *lcm_name, unsigned int lcm_fps,
 	DISPCHECK("%s begin lcm=%s, inited=%d\n",
 		__func__, lcm_name, is_lcm_inited);
 
+	pm_qos_add_request(&fb_blank_ddr_req, PM_QOS_DDR_OPP,
+		PM_QOS_DDR_OPP_DEFAULT_VALUE);
+
 	dprec_init();
 	dpmgr_init();
 	if (bdg_is_bdg_connected() == 1) {
@@ -3958,6 +4004,17 @@ int primary_display_init(char *lcm_name, unsigned int lcm_fps,
 	init_decouple_buffer_thread =
 		kthread_run(_init_decouple_buffers_thread,
 			NULL, "init_decouple_buffer");
+
+#ifdef SWITCH_FPS_IN_WORKQUEUE
+	INIT_WORK(&sWork, fb_resume_func);
+	fb_resume_workqueue = create_workqueue("fb_resume_wq");
+	if (fb_resume_workqueue == NULL) {
+		DISPERR("Failed to create fb_resume_workqueue!!!");
+		ret = DISP_STATUS_ERROR;
+		goto done;
+	}
+#endif
+
 	if (IS_ERR(init_decouple_buffer_thread))
 		DISPERR("kthread_run init_decouple_buffer_thread err = %d",
 			IS_ERR(init_decouple_buffer_thread));
@@ -4474,6 +4531,7 @@ int primary_display_deinit(void)
 	pm_qos_remove_request(&primary_display_mm_freq_request);
 #endif
 
+	pm_qos_remove_request(&fb_blank_ddr_req);
 	return 0;
 }
 
@@ -5349,6 +5407,9 @@ int primary_display_resume(void)
 	}
 
 #ifdef CONFIG_MTK_HIGH_FRAME_RATE
+#ifdef SWITCH_FPS_IN_WORKQUEUE
+	fb_resume_queue_work();
+#else
 	/*DynFPS*/
 	/*check whether need change fps according cfg*/
 	if (primary_display_is_support_DynFPS()) {
@@ -5359,12 +5420,14 @@ int primary_display_resume(void)
 		primary_display_dynfps_chg_fps(last_cfg);
 	}
 #endif
+#endif
 done:
 	primary_set_state(DISP_ALIVE);
 #if 0 //def CONFIG_TRUSTONIC_TRUSTED_UI
 	switch_set_state(&disp_switch_data, DISP_ALIVE);
 #endif
 
+	DISPCHECK("done. begin\n");
 	/* need enter share sram for resume */
 	if (disp_helper_get_option(DISP_OPT_SHARE_SRAM))
 		enter_share_sram(CMDQ_SYNC_RESOURCE_WROT1);
@@ -5386,6 +5449,8 @@ done:
 	mmprofile_log_ex(ddp_mmp_get_events()->primary_resume,
 		MMPROFILE_FLAG_END, 0, 0);
 	ddp_clk_check();
+
+	DISPCHECK("%s: done. end\n", __func__);
 	return ret;
 }
 
