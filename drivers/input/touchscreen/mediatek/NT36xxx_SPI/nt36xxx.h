@@ -106,12 +106,9 @@ extern const uint16_t touch_key_array[TOUCH_KEY_NUM];
 #define TOUCH_FORCE_NUM 1000
 
 /* Enable only when module have tp reset pin and connected to host */
-/* Huaqin modify for TP not need tp reset by zhangjiangbin at 2021/07/13 start */
 #ifndef CONFIG_TARGET_PRODUCT_SELENECOMMON
 #define NVT_TOUCH_SUPPORT_HW_RST 1
 #endif
-
-/* Huaqin modify for TP not need tp reset by zhangjiangbin at 2021/07/13 end */
 
 //---Customerized func.---
 #define NVT_TOUCH_PROC 1
@@ -169,18 +166,18 @@ struct nvt_ts_data {
 	uint8_t fw_ver;
 	uint8_t x_num;
 	uint8_t y_num;
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	uint16_t abs_x_max;
 	uint16_t abs_y_max;
 	uint8_t max_touch_num;
 	uint8_t max_button_num;
 #endif
 	uint32_t int_trigger_type;
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	int32_t irq_gpio;
 #endif
 	uint32_t irq_flags;
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	int32_t reset_gpio;
 #endif
 	uint32_t reset_flags;
@@ -289,6 +286,7 @@ void nvt_bootloader_reset_locked(void);
 int32_t nvt_esd_vdd_tp_recovery(void);
 #endif
 /* Huaqin modify for HQ-144782 by caogaojie at 2021/07/05 end */
+#if defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 #define RESET_GPIO (325 + 92)
 #define IRQ_GPIO (325 + 1)
 #define SWRST_N8_ADDR 258302
@@ -296,4 +294,5 @@ int32_t nvt_esd_vdd_tp_recovery(void);
 #define ABS_X_MAX TOUCH_DEFAULT_MAX_WIDTH
 #define ABS_Y_MAX TOUCH_DEFAULT_MAX_HEIGHT
 #define MAX_BUTTON_NUM TOUCH_KEY_NUM
+#endif
 #endif /* _LINUX_NVT_TOUCH_H */

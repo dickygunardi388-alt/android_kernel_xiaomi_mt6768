@@ -105,7 +105,7 @@ static void nvt_ts_late_resume(struct early_suspend *h);
 char lockdown[17] = {0};
 /*BSP.Tp - 2020.11.05 -add NVT_LOCKDOWN - end*/
 uint32_t ENG_RST_ADDR  = 0x7FFF80;
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 uint32_t SWRST_N8_ADDR; //read from dtsi
 uint32_t SPI_RD_FAST_ADDR;	//read from dtsi
 #endif
@@ -783,7 +783,7 @@ info_retry:
 	ts->fw_ver = buf[1];
 	ts->x_num = buf[3];
 	ts->y_num = buf[4];
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	ts->abs_x_max = (uint16_t)((buf[5] << 8) | buf[6]);
 	ts->abs_y_max = (uint16_t)((buf[7] << 8) | buf[8]);
 	ts->max_button_num = buf[11];
@@ -795,7 +795,7 @@ info_retry:
 		ts->fw_ver = 0;
 		ts->x_num = 18;
 		ts->y_num = 32;
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 		ts->abs_x_max = TOUCH_DEFAULT_MAX_WIDTH;
 		ts->abs_y_max = TOUCH_DEFAULT_MAX_HEIGHT;
 		ts->max_button_num = TOUCH_KEY_NUM;
@@ -809,7 +809,7 @@ info_retry:
 			NVT_ERR("Set default fw_ver=%d, x_num=%d, y_num=%d, "
 					"abs_x_max=%d, abs_y_max=%d, max_button_num=%d!\n",
 					ts->fw_ver, ts->x_num, ts->y_num,
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 					ts->abs_x_max, ts->abs_y_max, ts->max_button_num);
 #else
 					ABS_X_MAX, ABS_Y_MAX, MAX_BUTTON_NUM);
@@ -1173,7 +1173,7 @@ void nvt_ts_wakeup_gesture_report(uint8_t gesture_id, uint8_t *data)
 }
 #endif
 
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 /*******************************************************
 Description:
 	Novatek touchscreen parse device tree function.
@@ -1509,7 +1509,7 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 	}
 #endif
 
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	for (i = 0; i < ts->max_touch_num; i++) {
 #else
 	for (i = 0; i < TOUCH_MAX_FINGER_NUM; i++) {
@@ -1517,7 +1517,7 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 		position = 1 + 6 * i;
 		input_id = (uint8_t) (point_data[position] >> 3);
 
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 		if ((input_id == 0) || (input_id > ts->max_touch_num))
 #else
 		if ((input_id == 0) || (input_id > TOUCH_MAX_FINGER_NUM))
@@ -1554,7 +1554,7 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 	}
 
 #if MT_PROTOCOL_B
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	for (i = 0; i < ts->max_touch_num; i++) {
 #else
 	for (i = 0; i < TOUCH_MAX_FINGER_NUM; i++) {
@@ -1580,7 +1580,7 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 		/* update interrupt timer */
 		irq_timer = jiffies;
 #endif /* #if NVT_TOUCH_ESD_PROTECT */
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 		for (i = 0; i < ts->max_button_num; i++) {
 #else
 		for (i = 0; i < MAX_BUTTON_NUM; i++) {
@@ -1588,7 +1588,7 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 			input_report_key(ts->input_dev, touch_key_array[i], ((point_data[62] >> i) & 0x01));
 		}
 	} else {
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 		for (i = 0; i < ts->max_button_num; i++) {
 #else
 		for (i = 0; i < MAX_BUTTON_NUM; i++) {
@@ -1617,7 +1617,7 @@ return:
 *******************************************************/
 static int8_t nvt_ts_check_chip_ver_trim(uint32_t chip_ver_trim_addr)
 {
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	uint8_t buf[8] = {0};
 	int32_t retry = 0;
 	int32_t list = 0;
@@ -1954,7 +1954,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 
 	NVT_LOG("mode=%d, max_speed_hz=%d\n", ts->client->mode, ts->client->max_speed_hz);
 
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	//---parse dts---
 	ret = nvt_parse_dt(&client->dev);
 	if (ret) {
@@ -1995,7 +1995,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 		}
 	}
 
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	ts->abs_x_max = TOUCH_DEFAULT_MAX_WIDTH;
 	ts->abs_y_max = TOUCH_DEFAULT_MAX_HEIGHT;
 #endif
@@ -2008,11 +2008,11 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 		goto err_input_dev_alloc_failed;
 	}
 
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	ts->max_touch_num = TOUCH_MAX_FINGER_NUM;
 #endif
 
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 #if TOUCH_KEY_NUM > 0
 	ts->max_button_num = TOUCH_KEY_NUM;
 #endif
@@ -2027,7 +2027,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	ts->input_dev->propbit[0] = BIT(INPUT_PROP_DIRECT);
 
 #if MT_PROTOCOL_B
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	input_mt_init_slots(ts->input_dev, ts->max_touch_num, 0);
 #else
 	input_mt_init_slots(ts->input_dev, TOUCH_MAX_FINGER_NUM, 0);
@@ -2039,7 +2039,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 #if TOUCH_MAX_FINGER_NUM > 1
 	input_set_abs_params(ts->input_dev, ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0);    //area = 255
 
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	input_set_abs_params(ts->input_dev, ABS_MT_POSITION_X, 0, ts->abs_x_max - 1, 0, 0);
 	input_set_abs_params(ts->input_dev, ABS_MT_POSITION_Y, 0, ts->abs_y_max - 1, 0, 0);
 #else
@@ -2049,7 +2049,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 #if MT_PROTOCOL_B
 	// no need to set ABS_MT_TRACKING_ID, input_mt_init_slots() already set it
 #else
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	input_set_abs_params(ts->input_dev, ABS_MT_TRACKING_ID, 0, ts->max_touch_num, 0, 0);
 #else
 	input_set_abs_params(ts->input_dev, ABS_MT_TRACKING_ID, 0, TOUCH_MAX_FINGER_NUM, 0, 0);
@@ -2058,7 +2058,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 #endif //TOUCH_MAX_FINGER_NUM > 1
 
 #if TOUCH_KEY_NUM > 0
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	for (retry = 0; retry < ts->max_button_num; retry++) {
 #else
 	for (retry = 0; retry < MAX_BUTTON_NUM; retry++) {
@@ -2571,7 +2571,7 @@ static int32_t nvt_ts_suspend(struct device *dev)
 
 	/* release all touches */
 #if MT_PROTOCOL_B
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	for (i = 0; i < ts->max_touch_num; i++) {
 #else
 	for (i = 0; i < TOUCH_MAX_FINGER_NUM; i++) {
@@ -2650,7 +2650,7 @@ int32_t nvt_ts_tp_suspend(void)
 
 	/* release all touches */
 #if MT_PROTOCOL_B
-#if !defined(CONFIG_TARGET_PRODUCT_LANCELOTCOMMON) && !defined(CONFIG_TARGET_PRODUCT_MERLINCOMMON) && !defined(CONFIG_TARGET_PRODUCT_SHIVACOMMON)
+#if  !defined(CONFIG_TOUCHSCREEN_NT36xxx_SPI_HARDCODED)
 	for (i = 0; i < ts->max_touch_num; i++) {
 #else
 	for (i = 0; i < TOUCH_MAX_FINGER_NUM; i++) {
