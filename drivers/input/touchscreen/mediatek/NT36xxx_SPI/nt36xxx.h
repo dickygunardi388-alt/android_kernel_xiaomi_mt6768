@@ -106,7 +106,12 @@ extern const uint16_t touch_key_array[TOUCH_KEY_NUM];
 #define TOUCH_FORCE_NUM 1000
 
 /* Enable only when module have tp reset pin and connected to host */
+/* Huaqin modify for TP not need tp reset by zhangjiangbin at 2021/07/13 start */
+#ifndef CONFIG_TARGET_PRODUCT_SELENECOMMON
 #define NVT_TOUCH_SUPPORT_HW_RST 1
+#endif
+
+/* Huaqin modify for TP not need tp reset by zhangjiangbin at 2021/07/13 end */
 
 //---Customerized func.---
 #define NVT_TOUCH_PROC 1
